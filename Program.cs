@@ -1,39 +1,38 @@
 ﻿using System;
-using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.SignalR.Client;
 
 namespace DroneTest.Agent
 {
     class Program
     {
-        private static HubConnection myConnection;
+        private static ConnectionManager myConnectionManager;
+        private static Agent myAgent;
 
-        static void Main( string[] args )
+        static void Main(string[] args)
         {
-            InitConnection();
+            myConnectionManager = new ConnectionManager();
 
-            TryToConnect();
+            myAgent = new Agent();
 
             ProcessUserMessageLoop();
 
-            Console.WriteLine( "exiting" );
+            myAgent.Dispose();
+            Console.WriteLine("exiting");
         }
 
         private static void ProcessUserMessageLoop()
         {
-            Console.WriteLine( "Please specify command for new operation: \n status: print agent status \n connect: try to connect to configured server \n exit: press 'x'" );
+            Console.WriteLine("Please specify command for new operation: \n status: print agent status \n connect: try to connect to configured server \n exit: press 'x'");
 
             string newCommand = Console.ReadLine();
-            while( newCommand != "x" )
+            while (newCommand != "x")
             {
-                if( newCommand == "s" ) //status
+                if (newCommand == "s") //status
                 {
                     PrintAgentStatus();
                 }
-                else if( newCommand == "c" ) //connect
+                else if (newCommand == "c") //connect
                 {
-                    TryToConnect();
+                    myConnectionManager.TryToConnect();
                 }
 
                 newCommand = Console.ReadLine();
@@ -43,41 +42,6 @@ namespace DroneTest.Agent
         private static void PrintAgentStatus()
         {
 
-        }
-
-        private static void InitConnection()
-        {
-            myConnection = new HubConnectionBuilder()
-                           .WithUrl( "https://localhost:5001/masterHub" )
-                           .Build();
-
-            myConnection.Closed += async ( error ) =>
-            {
-                await Task.Delay( new Random().Next( 0, 5 ) * 1000 );
-                await myConnection.StartAsync();
-            };
-
-            myConnection.On<string, string>( "ReceiveMessage", ( user, message ) =>
-            {
-                var encodedMsg = user + " says " + message;
-                Console.WriteLine( $"Received message{encodedMsg}" );
-            } );
-        }
-
-        /// <summary>
-        /// max retry count 10.
-        /// </summary>
-        private static async void TryToConnect()
-        {
-            try
-            {
-                await myConnection.StartAsync();
-                Console.WriteLine( "Connection started" );
-            }
-            catch( Exception ex )
-            {
-                Console.Error.WriteLine( "exception while connection" );
-            }
         }
     }
 }
