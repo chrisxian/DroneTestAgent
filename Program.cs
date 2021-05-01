@@ -13,6 +13,8 @@ namespace DroneTest.Agent
 
             myAgent = new Agent();
 
+            
+
             ProcessUserMessageLoop();
 
             myAgent.Dispose();
