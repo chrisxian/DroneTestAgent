@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -10,14 +8,13 @@ namespace DroneTest.AgentService
 {
     public class TimedHostedService : IHostedService, IDisposable
     {
-        private int myExecutionCount = 0;
         private readonly ILogger<TimedHostedService> myLogger;
+        private readonly IAgentService myAgent;
         private Timer myTimer;
 
-        public TimedHostedService(ILogger<TimedHostedService> logger)
-        {
-            myLogger = logger;
-        }
+        public TimedHostedService(IAgentService agent, ILogger<TimedHostedService> logger)
+        => (myAgent, myLogger) = (agent, logger);
+
 
         public Task StartAsync(CancellationToken stoppingToken)
         {
@@ -31,10 +28,8 @@ namespace DroneTest.AgentService
 
         private void DoWork(object state)
         {
-            var count = Interlocked.Increment(ref myExecutionCount);
-
-            myLogger.LogInformation(
-                "Timed Hosted Service is working. Count: {Count}", count);
+            //triggered in a background thread, has to ensure thread-safety in each state implementation!
+            myAgent.CurrentState.Handle();
         }
 
         public Task StopAsync(CancellationToken stoppingToken)

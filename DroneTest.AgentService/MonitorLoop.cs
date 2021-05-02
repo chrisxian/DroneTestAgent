@@ -17,11 +17,13 @@ namespace DroneTest.AgentService
             myCancellationToken = applicationLifetime.ApplicationStopping;
         }
 
+        /// <summary>
+        /// Run a console user input loop in a background thread
+        /// </summary>
         public void StartMonitorLoop()
         {
             myLogger.LogInformation("MonitorAsync Loop is starting.");
 
-            // Run a console user input loop in a background thread
             Task.Run(MonitorAsync, myCancellationToken);
         }
 
