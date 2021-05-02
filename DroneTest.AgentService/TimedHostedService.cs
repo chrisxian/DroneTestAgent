@@ -21,15 +21,17 @@ namespace DroneTest.AgentService
             myLogger.LogInformation("Timed Hosted Service running.");
 
             myTimer = new Timer(DoWork, null, TimeSpan.Zero,
-                TimeSpan.FromSeconds(5));
+                TimeSpan.FromSeconds(10));
 
+            //DoWork of Timer is called in a ThreadPool thread,
+            //has to avoid a duplicated State.Handle if previous one is still ongoing.
+            //also has to ensure thread-safety in each state implementation!
             return Task.CompletedTask;
         }
 
         private void DoWork(object state)
         {
-            //triggered in a background thread, has to ensure thread-safety in each state implementation!
-            myAgent.CurrentState.Handle();
+            myAgent.CurrentState.Handle(myAgent);
         }
 
         public Task StopAsync(CancellationToken stoppingToken)

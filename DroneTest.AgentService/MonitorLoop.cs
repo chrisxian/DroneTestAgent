@@ -35,9 +35,8 @@ namespace DroneTest.AgentService
 
                 if (keyStroke.Key == ConsoleKey.W)
                 {
-                    // Enqueue a background work item
                     //todo:
-                    Console.WriteLine("W key is pressed");
+                    Console.WriteLine("\n W key is pressed");
                 }
             }
         }

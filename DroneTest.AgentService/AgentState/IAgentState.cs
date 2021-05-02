@@ -2,6 +2,8 @@
 {
     public interface IAgentState
     {
-        void Handle();
+        AgentStateType StateType { get; }
+
+        void Handle(IAgentService agent);
     }
 }

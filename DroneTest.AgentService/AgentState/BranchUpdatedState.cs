@@ -1,25 +1,43 @@
-﻿namespace DroneTest.AgentService.AgentState
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+
+namespace DroneTest.AgentService.AgentState
 {
     internal class BranchUpdatedState : IAgentState
     {
+        private readonly ILogger myLogger;
         private readonly IConnectionManager myConnectionManager;
-        private readonly Agent myAgent;
+        private readonly CancellationToken myCancellationToken;
 
-        public BranchUpdatedState(Agent agent, IConnectionManager connectionManager)
-            => (myAgent, myConnectionManager) = (agent, connectionManager);
-
-        public void Handle()
+        public BranchUpdatedState(IConnectionManager connectionManager, ILogger<BranchUpdatedState> logger, IHostApplicationLifetime applicationLifetime)
         {
-            //todo: check isConnected,
+            StateType = AgentStateType.BranchUpdatedState;
+
+            myConnectionManager = connectionManager;
+            myLogger = logger;
+            myCancellationToken = applicationLifetime.ApplicationStopping;
+        }
+
+        public AgentStateType StateType { get; private set; }
+
+        public async void Handle(IAgentService agent)
+        {
+            //thread safe: how to avoid duplicated TryConnect call.
+            //assumption: TimedHostedService interval is longer than TryConnect,
+            //otherwise have to implement in a thread safe way checking is tryConnect ongoing.
+            await myConnectionManager.TryConnect();
+
             if (myConnectionManager.IsConnected)
             {
-                myAgent.CurrentState = new StandbyState();
+                agent.SetState(AgentStateType.StandbyState);
             }
             else
             {
-                myConnectionManager.TryConnect();
+                //stays in BranchUpdatedStated until next State.Handle by TimedHostedService.
             }
-            //if not connected: start reconnect
         }
     }
 }
