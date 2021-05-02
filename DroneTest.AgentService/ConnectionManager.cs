@@ -1,17 +1,20 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace DroneTest.AgentService
 {
-    public class ConnectionManager: IConnectionManager
+    public class ConnectionManager : IConnectionManager
     {
         private HubConnection myConnection;
+        private readonly ILogger<ConnectionManager> myLogger;
 
         public bool IsConnected { get; private set; }
 
-        public ConnectionManager()
+        public ConnectionManager(ILogger<ConnectionManager> logger)
         {
+            myLogger = logger;
             InitConnection();
         }
 
@@ -23,16 +26,14 @@ namespace DroneTest.AgentService
 
             myConnection.Closed += async (error) =>
             {
-                //await Task.Delay(new Random().Next(0, 5) * 1000);
-                //await myConnection.StartAsync();
                 IsConnected = false;
-                Console.WriteLine("Connection is down!");
+                myLogger.LogWarning("Connection is down!");
             };
 
             myConnection.On<string, string>("ReceiveMessage", (user, message) =>
             {
                 var encodedMsg = user + " says " + message;
-                Console.WriteLine($"Received message{encodedMsg}");
+                myLogger.LogInformation($"Received message{encodedMsg}");
             });
         }
 
@@ -41,18 +42,19 @@ namespace DroneTest.AgentService
             //todo: thread-safe
             if (IsConnected)
             {
-                //return; do not return null task!!
-                await Task.CompletedTask;
+                myLogger.LogInformation($"connected already");
+                return;
             }
             try
             {
+                myLogger.LogInformation("Connection starting");
                 await myConnection.StartAsync();
                 IsConnected = true;
-                Console.WriteLine("Connection started");
+                myLogger.LogInformation("Connection started");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("exception while connection");
+                myLogger.LogError($"exception while connection{ex.Message}");
             }
         }
     }

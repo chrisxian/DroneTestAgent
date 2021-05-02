@@ -1,9 +1,14 @@
-﻿namespace DroneTest.AgentService.AgentState
+﻿using Microsoft.Extensions.Logging;
+
+namespace DroneTest.AgentService.AgentState
 {
     internal class StandbyState : IAgentState
     {
-        public StandbyState()
+        private readonly ILogger<StandbyState> myLogger;
+
+        public StandbyState(ILogger<StandbyState> logger)
         {
+            myLogger = logger;
             StateType = AgentStateType.StandbyState;
         }
 
@@ -11,8 +16,9 @@
 
         public void Handle(IAgentService agent)
         {
-            //todo: start connection 
-            //todo: start to check if branchupdate needed
+            myLogger.LogInformation("Handle called");
+            //todo: request a test task to execute and enter executing state.
+
         }
     }
 }

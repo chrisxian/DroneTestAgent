@@ -21,7 +21,8 @@ namespace DroneTest.AgentService
 
         protected override void DoWork(object state)
         {
-            base.DoWork(state);
+            //only trigger state handling, do not care about handling result.
+            //so no need to change IAgentState.Handle signature to async Task.
             CurrentState.Handle(this);
         }
 

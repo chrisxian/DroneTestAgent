@@ -6,12 +6,12 @@ using Microsoft.Extensions.Logging;
 
 namespace DroneTest.AgentService
 {
-    public class TimedHostedService : IHostedService, IDisposable
+    public abstract class TimedHostedService : IHostedService, IDisposable
     {
         protected readonly ILogger<TimedHostedService> Logger;
         private Timer myTimer;
 
-        public TimedHostedService(ILogger<TimedHostedService> logger)
+        protected TimedHostedService(ILogger<TimedHostedService> logger)
             => Logger = logger;
 
 
@@ -28,12 +28,7 @@ namespace DroneTest.AgentService
             return Task.CompletedTask;
         }
 
-        protected virtual void DoWork(object state)
-        {
-            //only trigger state handling, do not care about handling result.
-            //so no need to change IAgentState.Handle signature to async Task.
-            //myAgent.CurrentState.Handle(myAgent);
-        }
+        protected abstract void DoWork(object state);
 
         public Task StopAsync(CancellationToken stoppingToken)
         {
