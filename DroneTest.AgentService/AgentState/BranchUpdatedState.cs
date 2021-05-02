@@ -23,7 +23,12 @@ namespace DroneTest.AgentService.AgentState
 
         public AgentStateType StateType { get; private set; }
 
-        public async void Handle(IAgentService agent)
+        public void Handle(IAgentService agent)
+        {
+            _ = ConnectAndSwitchState(agent);
+        }
+
+        private async Task ConnectAndSwitchState(IAgentService agent)
         {
             //thread safe: how to avoid duplicated TryConnect call.
             //assumption: TimedHostedService interval is longer than TryConnect,

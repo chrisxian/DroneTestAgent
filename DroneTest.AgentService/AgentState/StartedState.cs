@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace DroneTest.AgentService.AgentState
 {
@@ -26,10 +27,13 @@ namespace DroneTest.AgentService.AgentState
 
         public void Handle(IAgentService agent)
         {
-            CheckBranchUpdate(agent);
+            _ = CheckBranchUpdate(agent);
+            //use discard only if you're sure that:
+            //1.you don't want to wait for the asynchronous call to complete 
+            //2.the called method won't raise any exceptions.
         }
 
-        private async void CheckBranchUpdate(IAgentService agent)
+        private async Task CheckBranchUpdate(IAgentService agent)
         {
             //todo: thread safe
             myLogger.LogInformation("CheckBranchUpdate.");
