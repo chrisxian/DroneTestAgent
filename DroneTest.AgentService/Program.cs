@@ -26,8 +26,8 @@ namespace DroneTest.AgentService
                     services.AddSingleton<IAgentState, StartedState>();
                     services.AddSingleton<IAgentState, BranchUpdatedState>();
                     services.AddSingleton<IAgentState, StandbyState>();
-                    services.AddSingleton<IAgentService, Agent>();
-                    services.AddHostedService<TimedHostedService>();
+                    //services.AddSingleton<IAgentService, Agent>();
+                    services.AddHostedService<AgentService>();
                 });
     }
 }

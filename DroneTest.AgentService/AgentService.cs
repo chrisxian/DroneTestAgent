@@ -6,19 +6,24 @@ using Microsoft.Extensions.Logging;
 
 namespace DroneTest.AgentService
 {
-    class Agent : IAgentService
+    class AgentService : TimedHostedService, IAgentService
     {
         private readonly IEnumerable<IAgentState> myAvailableAgentStates;
-        private readonly ILogger<Agent> myLogger;
 
-        public Agent(IEnumerable<IAgentState> availableAgentStates, ILogger<Agent> logger)
+        public AgentService(IEnumerable<IAgentState> availableAgentStates, ILogger<AgentService> logger)
+            : base(logger)
         {
             myAvailableAgentStates = availableAgentStates;
-            myLogger = logger;
             SetState(AgentStateType.StartedState);
         }
 
         public IAgentState CurrentState { get; set; }
+
+        protected override void DoWork(object state)
+        {
+            base.DoWork(state);
+            CurrentState.Handle(this);
+        }
 
         public void SetState(AgentStateType requestedStateType)
         {
@@ -26,12 +31,12 @@ namespace DroneTest.AgentService
             if (requestedState == null)
             {
                 var error = $"no available state with requested StateType {requestedStateType}";
-                myLogger.LogError(error);
+                Logger.LogError(error);
                 throw new NotSupportedException(error);
             }
 
             CurrentState = requestedState;
-            myLogger.LogInformation($"Agent state is set to {requestedStateType}");
+            Logger.LogInformation($"Agent state is set to {requestedStateType}");
         }
     }
 }

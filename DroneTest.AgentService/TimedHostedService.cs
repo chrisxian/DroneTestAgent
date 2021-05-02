@@ -8,17 +8,16 @@ namespace DroneTest.AgentService
 {
     public class TimedHostedService : IHostedService, IDisposable
     {
-        private readonly ILogger<TimedHostedService> myLogger;
-        private readonly IAgentService myAgent;
+        protected readonly ILogger<TimedHostedService> Logger;
         private Timer myTimer;
 
-        public TimedHostedService(IAgentService agent, ILogger<TimedHostedService> logger)
-        => (myAgent, myLogger) = (agent, logger);
+        public TimedHostedService(ILogger<TimedHostedService> logger)
+            => Logger = logger;
 
 
         public Task StartAsync(CancellationToken stoppingToken)
         {
-            myLogger.LogInformation("Timed Hosted Service running.");
+            Logger.LogInformation("Timed Hosted Service running.");
 
             myTimer = new Timer(DoWork, null, TimeSpan.Zero,
                 TimeSpan.FromSeconds(10));
@@ -29,16 +28,16 @@ namespace DroneTest.AgentService
             return Task.CompletedTask;
         }
 
-        private void DoWork(object state)
+        protected virtual void DoWork(object state)
         {
             //only trigger state handling, do not care about handling result.
             //so no need to change IAgentState.Handle signature to async Task.
-            myAgent.CurrentState.Handle(myAgent);
+            //myAgent.CurrentState.Handle(myAgent);
         }
 
         public Task StopAsync(CancellationToken stoppingToken)
         {
-            myLogger.LogInformation("Timed Hosted Service is stopping.");
+            Logger.LogInformation("Timed Hosted Service is stopping.");
 
             myTimer?.Change(Timeout.Infinite, 0);
 
