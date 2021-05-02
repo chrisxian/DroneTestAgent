@@ -5,7 +5,7 @@ namespace DroneTest.AgentService
 {
     class BranchUpdateManager : IBranchUpdateManager
     {
-        private ILogger<BranchUpdateManager> myLogger;
+        private readonly ILogger<BranchUpdateManager> myLogger;
 
         public BranchUpdateManager(ILogger<BranchUpdateManager> logger)
         {

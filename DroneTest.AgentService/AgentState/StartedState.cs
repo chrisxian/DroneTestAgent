@@ -36,7 +36,6 @@ namespace DroneTest.AgentService.AgentState
         private async Task CheckBranchUpdate(IAgentService agent)
         {
             //todo: thread safe
-            myLogger.LogInformation("CheckBranchUpdate.");
             //await myBranchUpdateManager.CheckBranchUpdate();
             if (myRsfaState != RsfaState.BranchUpdateNeeded)
             {

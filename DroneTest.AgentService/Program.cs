@@ -1,3 +1,4 @@
+using DroneTest.AgentService.AgentState;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -20,6 +21,11 @@ namespace DroneTest.AgentService
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddSingleton<MonitorLoop>();
+                    services.AddSingleton<IConnectionManager, ConnectionManager>();
+                    services.AddSingleton<IBranchUpdateManager, BranchUpdateManager>();
+                    services.AddSingleton<IAgentState, StartedState>();
+                    services.AddSingleton<IAgentState, BranchUpdatedState>();
+                    services.AddSingleton<IAgentState, StandbyState>();
                     services.AddSingleton<IAgentService, Agent>();
                     services.AddHostedService<TimedHostedService>();
                 });
