@@ -1,6 +1,7 @@
 using DroneTest.AgentService.AgentState;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace DroneTest.AgentService
 {
@@ -27,6 +28,12 @@ namespace DroneTest.AgentService
                     services.AddSingleton<IAgentState, BranchUpdatedState>();
                     services.AddSingleton<IAgentState, StandbyState>();
                     services.AddHostedService<AgentService>();
-                });
+                }).ConfigureLogging(builder =>
+                    builder.AddSimpleConsole(options =>
+                    {
+                        options.IncludeScopes = true;
+                        options.SingleLine = true;
+                        options.TimestampFormat = "hh:mm:ss ";
+                    }));
     }
 }

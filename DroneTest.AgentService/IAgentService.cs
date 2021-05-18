@@ -6,6 +6,6 @@ namespace DroneTest.AgentService
     {
         IAgentState CurrentState { get; }
 
-        void SetState(AgentState.AgentStateType requestedStateType);
+        void SetState(AgentStateType requestedStateType);
     }
 }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>dotnet-DroneTest.AgentService-341BAE73-4CEF-4D99-B6FE-6CA7F5F08D69</UserSecretsId>
   </PropertyGroup>
 
