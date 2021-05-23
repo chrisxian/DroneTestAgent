@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using System.Xml.Xsl;
 using DroneTest.AgentService.AgentState;
+using DroneTest.AgentService.Models.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -49,7 +51,7 @@ namespace DroneTest.AgentService
                     services.AddSingleton<IAgentState, BranchUpdatedState>();
                     services.AddSingleton<IAgentState, StandbyState>();
                     services.AddHostedService<AgentService>();
-
+                    services.Configure<ConnectionConfiguration>(hostContext.Configuration.GetSection(nameof(ConnectionConfiguration)));
                 }).UseSerilog((context, services, configuration) => configuration
                     .ReadFrom.Configuration(context.Configuration)
                     .ReadFrom.Services(services)

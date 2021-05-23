@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Threading.Tasks;
+using DroneTest.AgentService.Models.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace DroneTest.AgentService
 {
@@ -10,18 +12,23 @@ namespace DroneTest.AgentService
         private HubConnection myConnection;
         private readonly ILogger<ConnectionManager> myLogger;
 
+        private readonly ConnectionConfiguration myConnectionConfiguration;
+
+
         public bool IsConnected { get; private set; }
 
-        public ConnectionManager(ILogger<ConnectionManager> logger)
+        public ConnectionManager(ILogger<ConnectionManager> logger, IOptions<ConnectionConfiguration> options)
         {
             myLogger = logger;
+            myConnectionConfiguration = options.Value;
             InitConnection();
         }
 
         private void InitConnection()
         {
+            myLogger.LogDebug("Starting connection to {connectionUrl}", myConnectionConfiguration.ServerHubUrl);
             myConnection = new HubConnectionBuilder()
-                           .WithUrl("https://localhost:5001/masterHub")
+                           .WithUrl(myConnectionConfiguration.ServerHubUrl)
                            .Build();
 
             myConnection.Closed += async (error) =>
