@@ -20,5 +20,6 @@
 
   <ItemGroup>
     <Folder Include="Log\" />
+    <Folder Include="NewFolder\" />
   </ItemGroup>
 </Project>

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Events;
 
 namespace DroneTest.AgentService
 {
@@ -12,19 +13,16 @@ namespace DroneTest.AgentService
     {
         public static void Main(string[] args)
         {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", true)
-                .Build();
-
             Log.Logger = new LoggerConfiguration()
-               .ReadFrom.Configuration(configuration)
-               .CreateLogger();
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .CreateBootstrapLogger(); // <-- Change this line!
 
             try
             {
                 using IHost host = CreateHostBuilder(args).Build();
+
                 var monitorLoop = host.Services.GetRequiredService<MonitorLoop>();
                 monitorLoop.StartMonitorLoop();
                 host.Run();
@@ -52,13 +50,10 @@ namespace DroneTest.AgentService
                     services.AddSingleton<IAgentState, StandbyState>();
                     services.AddHostedService<AgentService>();
 
-                }).UseSerilog();
-        //}).ConfigureLogging(builder =>
-        //    builder.AddSimpleConsole(options =>
-        //    {
-        //        options.IncludeScopes = true;
-        //        options.SingleLine = true;
-        //        options.TimestampFormat = "hh:mm:ss ";
-        //    }));
+                }).UseSerilog((context, services, configuration) => configuration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .ReadFrom.Services(services)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console());
     }
 }
